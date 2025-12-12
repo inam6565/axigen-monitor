@@ -6,9 +6,11 @@ from sqlalchemy import (
     Column, Text, Integer, Numeric, TIMESTAMP, ForeignKey, func
 )
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import relationship, declarative_base
-
-Base = declarative_base()
+from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from backend.app.db.base import Base
 
 class Snapshot(Base):
     __tablename__ = "snapshots"
