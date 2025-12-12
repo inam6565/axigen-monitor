@@ -4,7 +4,7 @@ import asyncio
 from sqlalchemy import delete
 from backend.app.db.base import AsyncSessionLocal
 from backend.app.db.models import Server
-import inam
+
 
 async def delete_server(hostname: str):
     async with AsyncSessionLocal() as db:
@@ -38,6 +38,3 @@ if __name__ == "__main__":
     args = ensure_values(args)
 
     asyncio.run(delete_server(args.hostname))
-
-
-hfajdskfhasdjkfhajskd
