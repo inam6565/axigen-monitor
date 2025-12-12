@@ -15,6 +15,7 @@ load_dotenv()
 
 # Get database URL
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL is not set in the environment or .env file")
 
@@ -23,6 +24,9 @@ engine: AsyncEngine = create_async_engine(
     DATABASE_URL,
     echo=False,
     future=True,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"ssl": False},
 )
 
 # Create async session factory

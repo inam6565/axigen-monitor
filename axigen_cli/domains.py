@@ -1,63 +1,65 @@
 # axigen_cli/domains.py
 
 from __future__ import annotations
-
-from typing import List
+from typing import List, Dict
 from .client import AxigenCLIClient
 
 
-def parse_domain_list(raw: str) -> List[str]:
+def parse_all_domains(raw: str) -> List[Dict[str, str]]:
     """
-    Very simple parser for 'LIST domains' output.
-
-    Axigen's CLI LIST command returns tables; we:
-    - skip empty lines and header/underline lines
-    - take the first column of each data line as the domain
-    You may need to tweak this based on what your server prints.
+    Parser for 'LIST AllDomains'.
+    Expected columns:
+        name    Status
+    Example:
+        haseeb.co     enabled
+        inam.org      disabled
     """
-    domains: List[str] = []
+    domains = []
 
     for line in raw.splitlines():
         line = line.strip()
         if not line:
             continue
-        # skip header-ish lines
-        if line.lower().startswith("list") or line.lower().startswith("domains"):
+
+        # Skip headers / separators / footer lines
+        lower = line.lower()
+        if lower.startswith("the list of") or lower.startswith("name") or lower.startswith("list"):
             continue
         if line.startswith("---") or line.startswith("==="):
             continue
-
-        parts = line.split()
-        if not parts:
+        if line.startswith("+OK") or line.startswith("-ERR"):
             continue
 
-        # heuristic: first column is usually the domain name
-        candidate = parts[0]
-        # very basic filter (adjust if you use weird domain names)
-        if "." in candidate:
-            domains.append(candidate)
+        parts = line.split()
+        if len(parts) < 2:
+            continue
 
-    # de-duplicate while preserving order
-    seen = set()
-    unique_domains: List[str] = []
-    for d in domains:
-        if d not in seen:
-            seen.add(d)
-            unique_domains.append(d)
-    print(unique_domains)
-    return unique_domains
+        domain_name = parts[0]
+        status = parts[-1].lower()  # enabled / disabled / locked etc.
+
+        # Basic validation
+        if "." not in domain_name:
+            continue
+
+        domains.append({"domain": domain_name, "status": status})
+
+    return domains
 
 
-def list_domains(
+def list_all_domains(
     host: str,
     port: int,
     username: str,
     password: str,
-) -> List[str]:
+) -> List[Dict[str, str]]:
     """
-    Connect to Axigen CLI and return list of domains.
+    Calls `LIST AllDomains` and returns:
+        [
+            { "domain": "example.com", "status": "enabled" },
+            { "domain": "old.org", "status": "disabled" }
+        ]
     """
     with AxigenCLIClient(host, port) as cli:
         cli.login(username, password)
-        raw = cli.run_command("LIST domains")
-        return parse_domain_list(raw)
+        raw = cli.run_command("LIST AllDomains")
+        return parse_all_domains(raw)
