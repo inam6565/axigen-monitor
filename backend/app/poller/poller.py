@@ -15,6 +15,7 @@ from axigen_cli.accounts import list_accounts_for_domain
 
 
 
+
 async def poll_servers():
     """
     Main poller: iterate all servers, fetch domains & accounts,
@@ -103,7 +104,7 @@ async def poll_servers():
                         assigned = acc.get("assigned_mb") or 0
                         used = acc.get("used_mb") or 0
                         free = assigned - used if used else assigned
-
+                        
                         account_obj = Account(
                             domain_id=domain_obj.id,
                             local_part=local_part,
