@@ -71,28 +71,34 @@ def get_account_quota(
     # Extract local part (e.g. "inam" from "inam@podbeez.com")
     local_part = account.split("@", 1)[0]
 
+    def is_error(resp: str) -> bool:
+        r = (resp or "").lower()
+        return ("-err" in r) or ("error" in r) or ("unknown" in r)
+
     with AxigenCLIClient(host, port) as cli:
         cli.login(username, password)
 
-        # Go to the domain
-        resp = cli.run_command(f"UPDATE domain name {domain}")
-        if "-ERR" in resp:
-            raise RuntimeError(f"UPDATE domain failed: {resp}")
+        cmd1 = f"UPDATE domain name {domain}"
+        resp1 = cli.run_command(cmd1)
+        print(f"[DEBUG][QUOTA] {account} cmd={cmd1} resp={repr(resp1)}")
+        if is_error(resp1):
+            raise RuntimeError(f"UPDATE domain failed: {resp1}")
 
-        # Go to the account (local part only)
-        resp = cli.run_command(f"UPDATE account name {local_part}")
-        if "-ERR" in resp:
-            raise RuntimeError(
-                f'UPDATE account failed for "{local_part}" in domain "{domain}": {resp}'
-            )
+        cmd2 = f"UPDATE account name {local_part}"
+        resp2 = cli.run_command(cmd2)
+        print(f"[DEBUG][QUOTA] {account} cmd={cmd2} resp={repr(resp2)}")
+        if is_error(resp2):
+            raise RuntimeError(f'UPDATE account failed for "{local_part}" in "{domain}": {resp2}')
 
-        # Enter quotas context
-        resp = cli.run_command("CONFIG quotas")
-        if "-ERR" in resp:
-            raise RuntimeError(f"CONFIG quotas failed: {resp}")
+        cmd3 = "CONFIG quotas"
+        resp3 = cli.run_command(cmd3)
+        print(f"[DEBUG][QUOTA] {account} cmd={cmd3} resp={repr(resp3)}")
+        if is_error(resp3):
+            raise RuntimeError(f"CONFIG quotas failed: {resp3}")
 
-        # Show assigned quotas
-        raw_show = cli.run_command("SHOW")
+        cmd4 = "SHOW"
+        raw_show = cli.run_command(cmd4)
+        print(f"[DEBUG][QUOTA] {account} cmd={cmd4} raw_show_len={len(raw_show or '')} raw_show={repr(raw_show[:200])}")
 
-    quotas = parse_quota_show(raw_show)
-    return quotas, raw_show
+    quotas = parse_quota_show(raw_show or "")
+    return quotas, raw_show or ""

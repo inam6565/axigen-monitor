@@ -103,15 +103,36 @@ def _size_kb_to_gb(kb_value) -> Optional[int]:
 # Fetch WebAdmin TSV
 # ------------------------------
 def _fetch_webadmin_accounts(host: str, port: int, user: str, password: str) -> Optional[List[Dict]]:
-    url = f"https://{host}:{port}/data/accounts"
-    try:
-        resp = requests.get(url, auth=(user, password), verify=False, timeout=5)
-        if resp.status_code != 200:
-            return None
-        return _parse_tsv_accounts(resp.text)
-    except Exception:
-        return None
+    urls = [
+        f"https://{host}:{port}/data/accounts",  # HTTPS first (Ace is HTTPS-only)
+        f"http://{host}:{port}/data/accounts",   # HTTP fallback (Podbeez is HTTP)
+    ]
 
+    for url in urls:
+        try:
+            
+            resp = requests.get(
+                url,
+                auth=(user, password),
+                verify=False,   # allow expired/self-signed certs (Ace)
+                timeout=8,
+                headers={"Connection": "close"},  # helps with some servers
+            )
+            print("[DEBUG] status:", resp.status_code)
+
+            if resp.status_code != 200:
+                continue
+
+            rows = _parse_tsv_accounts(resp.text)
+            print("[DEBUG] parsed rows:", len(rows))
+            if rows:
+                return rows
+
+        except Exception as e:
+            print("[DEBUG] webadmin fetch exception:", repr(e))
+            continue
+
+    return None
 
 # ------------------------------
 # Main Function
@@ -156,7 +177,7 @@ def list_accounts_for_domain(
 
     # -------- WEBADMIN: fetch TSV once --------
     tsv_accounts = _fetch_webadmin_accounts(host, webadmin_port, username, password)
-
+    
     results = []
 
     for email in full_emails:
@@ -175,26 +196,31 @@ def list_accounts_for_domain(
                 account=email,  # full email is accepted; function extracts local part
             )
             total_msg_size_kb = quotas.get("totalMessageSize")
-            if total_msg_size_kb is not None:
+            if email.lower() == "test5@abdullah12.com":
+                print("\n[DEBUG][TEST5] quotas dict:", quotas)
+                print("[DEBUG][TEST5] raw quota output:\n", _raw, "\n")
+            if total_msg_size_kb is None:
+                print(f"[DEBUG][QUOTA] totalMessageSize missing for {email} domain={domain}. quotas keys={list(quotas.keys())}")
+                # optional: print raw response if you have it
+                # print(f"[DEBUG][QUOTA_RAW] {email} -> {_raw}")
+                assigned_mb = None
+            else:
                 assigned_mb = _size_kb_to_gb(total_msg_size_kb)
-        except Exception:
+        except Exception as e:
+            print(f"[DEBUG][QUOTA_ERR] {email} domain={domain} -> {repr(e)}")
             # if quota retrieval fails for this account, just leave assigned_mb as None
             assigned_mb = None
 
         # ----- Used size from WebAdmin TSV -----
         if tsv_accounts:
             for record in tsv_accounts:
-                if record.get("accountEmail", "").lower() == email.lower():
+                if (record.get("accountEmail") or "").strip().lower() == email.lower():
                     raw_mb = _size_kb_to_mb(record.get("mboxSizeKb"))
-                    if raw_mb is not None:
-                        if raw_mb < 1024:
-                            used_mb = f"{raw_mb} MB"
-                        else:
-                            used_gb = raw_mb / 1024
-                            used_mb = f"{used_gb:.2f} GB"
-                    else:
-                        used_mb = None
-                    #used_mb = _size_kb_to_mb(record.get("mboxSizeKb"))
+
+                    # STANDARD:
+                    # - None if missing or 0
+                    # - int MB if > 0
+                    used_mb = None if (raw_mb is None or raw_mb == 0) else raw_mb
                     break
 
         results.append({

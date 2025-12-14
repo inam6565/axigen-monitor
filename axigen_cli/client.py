@@ -9,7 +9,7 @@ class AxigenCLIError(Exception):
 
 
 class AxigenCLIClient:
-    def __init__(self, host: str, port: int = 7000, timeout: float = 3.0):
+    def __init__(self, host: str, port: int = 7000, timeout: float = 5.0):
         self.host = host
         self.port = port
         self.timeout = timeout
@@ -96,7 +96,7 @@ class AxigenCLIClient:
             # heuristic: if we got less than buffer size, likely end of response
             if len(chunk) < 4096:
                 break
-
+        
         return b"".join(chunks).decode("utf-8", errors="ignore")
 
     # context manager support
