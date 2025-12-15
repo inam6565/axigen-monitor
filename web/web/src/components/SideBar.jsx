@@ -36,17 +36,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>Servers</span>
             </NavLink>
           </li>
-          <li>
-            <NavLink
-              to="/domains"
-              className={({ isActive }) => 
-                `flex items-center px-4 py-3 ${isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`
-              }
-            >
-              <FiGlobe className="h-5 w-5" />
-              <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>Domains</span>
-            </NavLink>
-          </li>
+
           <li className="border-t border-gray-200 mt-2 pt-2">
             <NavLink
               to="/add-server"

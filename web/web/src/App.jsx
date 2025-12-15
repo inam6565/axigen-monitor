@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Header from './components/Header'
 import Sidebar from './components/SideBar'
-import Placeholder from './pages/PlaceholderPage'
+import SingleServerPage from './pages/SingleServerPage'
 import './App.css'
 import DashboardPage from './pages/DashboardPage'
 import PlaceholderPage from './pages/PlaceholderPage'
@@ -26,7 +26,7 @@ function App() {
               <Route path="/domains" element={<PlaceholderPage title="Domains" />} />
               <Route path="/add-server" element={<PlaceholderPage title="Add Server" />} />
               <Route path="/delete-server" element={<PlaceholderPage title="Delete Server" />} />
-              <Route path="//server/:serverName" element={<PlaceholderPage title="Server Details" />} />
+              <Route path="/server/:serverName" element={<SingleServerPage title="Server Details" />} />
             </Routes>
           </main>
         </div>
