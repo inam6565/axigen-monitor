@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Server, Database, Users, Clock, Download } from "lucide-react";
 import StatCard from "../components/StatCard";
+import Papa from "papaparse";  // Import PapaParse
 
 const API_BASE_URL = "http://127.0.0.1:8000";
 
@@ -66,9 +59,7 @@ const DashboardPage = () => {
       const stats = await Promise.all(
         servers.map(async (server) => {
           try {
-            const response = await fetch(
-              `${API_BASE_URL}/domains/server/${server.id}`
-            );
+            const response = await fetch(`${API_BASE_URL}/domains/server/${server.id}`);
             const domains = await response.json();
             const totalAccounts = domains.reduce(
               (sum, domain) => sum + domain.total_accounts,
@@ -94,15 +85,82 @@ const DashboardPage = () => {
     fetchServerStats();
   }, [servers]);
 
-    const formatDate = (dateString) => {
+  const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
     return date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
-    };
+  };
+
+  // Function to handle exporting data to CSV
+const handleExportCSV = async () => {
+  console.log("Export CSV button clicked!"); // Confirm button click
+
+  try {
+    // Fetch the data from the backend API
+    const response = await fetch(`${API_BASE_URL}/report`);
+    
+    // Ensure the response is OK (status code 200)
+    if (!response.ok) {
+      console.error("Failed to fetch report data. Status:", response.status);
+      throw new Error("Failed to fetch report data");
+    }
+
+    // Parse the response data
+    const data = await response.json();
+    console.log("Data received:", data); // Log the received data
+
+    // Check if data contains servers and if it's in the correct format
+    if (!data.servers || !Array.isArray(data.servers) || data.servers.length === 0) {
+      console.error("No servers data to export.");
+      return;
+    }
+
+    // Process the data to extract relevant details for CSV export
+    const processedData = [];
+
+    data.servers.forEach(server => {
+      // For each server, we loop through the domains and accounts
+      server.domains.forEach(domain => {
+        domain.accounts.forEach(account => {
+          processedData.push({
+            Server: server.name,
+            Hostname: server.hostname,
+            Domain: domain.name,
+            Account: account.email,  // Account name (email in this case)
+            Status: account.status ? account.status : "N/A",  // Account status, if available
+            AssignedMB: account.assigned_mb,
+            UsedMB: account.used_mb,
+            FreeMB: account.free_mb
+          });
+        });
+      });
+    });
+
+    console.log("Processed Data for CSV:", processedData); // Log the processed data
+
+    if (processedData.length === 0) {
+      console.error("No data to export.");
+      return;
+    }
+
+    // Convert the processed data to CSV format using PapaParse
+    const csv = Papa.unparse(processedData);
+    console.log("CSV data generated:", csv); // Log the generated CSV
+
+    // Create a Blob from the CSV and trigger the download
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "report.csv"; // Default download file name
+    link.click(); // Trigger the download
+  } catch (error) {
+    console.error("Error exporting CSV:", error);
+  }
+};
 
 
   return (
@@ -110,30 +168,30 @@ const DashboardPage = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-4 gap-4">
         <StatCard
-        icon={Server}
-        label="Connected Servers"
-        value={summary?.servers_count || 0}
-        loading={summaryLoading}
+          icon={Server}
+          label="Connected Servers"
+          value={summary?.servers_count || 0}
+          loading={summaryLoading}
         />
         <StatCard
-        icon={Database}
-        label="Total Domains"
-        value={summary?.domains_count || 0}
-        loading={summaryLoading}
+          icon={Database}
+          label="Total Domains"
+          value={summary?.domains_count || 0}
+          loading={summaryLoading}
         />
         <StatCard
-        icon={Users}
-        label="Total Accounts"
-        value={summary?.accounts_count || 0}
-        loading={summaryLoading}
+          icon={Users}
+          label="Total Accounts"
+          value={summary?.accounts_count || 0}
+          loading={summaryLoading}
         />
         <StatCard
-        icon={Clock}
-        label="Last Snapshot"
-        value={formatDate(summary?.last_snapshot_time)}
-        loading={summaryLoading}
+          icon={Clock}
+          label="Last Snapshot"
+          value={formatDate(summary?.last_snapshot_time)}
+          loading={summaryLoading}
         />
-    </div>
+      </div>
 
       {/* Chart */}
       <SectionCard title="Domains distribution by server">
@@ -145,22 +203,9 @@ const DashboardPage = () => {
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={serverStats}>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke="#e2e8f0"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="name"
-                  stroke="#64748b"
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
-                <YAxis
-                  stroke="#64748b"
-                  tick={{ fill: "#64748b", fontSize: 12 }}
-                  axisLine={{ stroke: "#e2e8f0" }}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#e2e8f0" }} />
+                <YAxis stroke="#64748b" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={{ stroke: "#e2e8f0" }} />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#ffffff",
@@ -170,12 +215,7 @@ const DashboardPage = () => {
                   }}
                   cursor={{ fill: "#f1f5f9", opacity: 0.7 }}
                 />
-                <Bar
-                  dataKey="domains"
-                  fill="#3b82f6"
-                  radius={[8, 8, 0, 0]}
-                  maxBarSize={56}
-                />
+                <Bar dataKey="domains" fill="#3b82f6" radius={[8, 8, 0, 0]} maxBarSize={56} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -186,10 +226,13 @@ const DashboardPage = () => {
       <SectionCard
         title="Server overview"
         right={
-          <button className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+            <button
+            onClick={handleExportCSV} // Make sure this triggers the export function
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-3 py-2 text-xs font-semibold text-white hover:bg-slate-800"
+            >
             <Download className="h-4 w-4" />
             Export CSV
-          </button>
+            </button>
         }
       >
         <div className="overflow-hidden rounded-xl border border-slate-200">
@@ -201,40 +244,37 @@ const DashboardPage = () => {
                   <th>Hostname</th>
                   <th>Domains</th>
                   <th>Accounts</th>
+                  <th>Actions</th> {/* New column for the "View Server" link */}
                 </tr>
               </thead>
 
               <tbody className="divide-y divide-slate-200 bg-white">
                 {serversLoading || statsLoading ? (
                   <tr>
-                    <td colSpan="4" className="py-10 text-center">
+                    <td colSpan="5" className="py-10 text-center">
                       <p className="text-sm text-slate-500">Loading servers…</p>
                     </td>
                   </tr>
                 ) : (
                   servers?.map((server) => {
-                    const stats =
-                      serverStats.find((s) => s.name === server.name) || {
-                        domains: 0,
-                        accounts: 0,
-                      };
+                    const stats = serverStats.find((s) => s.name === server.name) || {
+                      domains: 0,
+                      accounts: 0,
+                    };
 
                     return (
-                      <tr
-                        key={server.id}
-                        className="hover:bg-slate-50 transition-colors"
-                      >
-                        <td className="px-4 py-3 font-medium text-slate-900">
-                          {server.name}
-                        </td>
-                        <td className="px-4 py-3 text-slate-600 tabular-nums font-mono">
-                          {server.hostname}
-                        </td>
-                        <td className="px-4 py-3 tabular-nums font-semibold text-slate-900">
-                          {stats.domains}
-                        </td>
-                        <td className="px-4 py-3 tabular-nums font-semibold text-emerald-600">
-                          {stats.accounts}
+                      <tr key={server.id} className="hover:bg-slate-50 transition-colors">
+                        <td className="px-4 py-3 font-medium text-slate-900">{server.name}</td>
+                        <td className="px-4 py-3 text-slate-600 tabular-nums font-mono">{server.hostname}</td>
+                        <td className="px-4 py-3 tabular-nums font-semibold text-slate-900">{stats.domains}</td>
+                        <td className="px-4 py-3 tabular-nums font-semibold text-emerald-600">{stats.accounts}</td>
+                        <td className="px-4 py-3">
+                          <a
+                            href={`/server/${server.name}`}
+                            className="text-indigo-600 hover:text-indigo-900"
+                          >
+                            View Server
+                          </a>
                         </td>
                       </tr>
                     );
