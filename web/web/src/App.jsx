@@ -7,6 +7,11 @@ import SingleServerPage from './pages/SingleServerPage'
 import './App.css'
 import DashboardPage from './pages/DashboardPage'
 import PlaceholderPage from './pages/PlaceholderPage'
+import DomainPage from "./pages/DomainPage" // The domain page component
+import ServersPage from './pages/ServerPage'
+import AddServerPage from './pages/add_server'
+import DeleteServerPage from './pages/delete_server'
+
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -22,11 +27,13 @@ function App() {
           <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4">
             <Routes>
               <Route path="/" element={<DashboardPage />} />
-              <Route path="/servers" element={<PlaceholderPage title="Servers" />} />
-              <Route path="/domains" element={<PlaceholderPage title="Domains" />} />
-              <Route path="/add-server" element={<PlaceholderPage title="Add Server" />} />
-              <Route path="/delete-server" element={<PlaceholderPage title="Delete Server" />} />
+              <Route path="/servers" element={<ServersPage title="Servers" />} />
+              <Route path="/add-server" element={<AddServerPage title="Add Server" />} />
+              <Route path="/delete-server" element={<DeleteServerPage title="Delete Server" />} />
               <Route path="/server/:serverName" element={<SingleServerPage title="Server Details" />} />
+              <Route path="/domain/:domain" element={<DomainPage title="Domain Details"/>} />
+              
+              
             </Routes>
           </main>
         </div>

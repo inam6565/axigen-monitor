@@ -6,6 +6,8 @@ from backend.app.api.accounts import router as accounts_router
 from backend.app.api.dashboard import router as dashboard_router
 from backend.app.api.summary import router as summary_router
 from backend.app.api.report import router as report_router
+from backend.app.api.add_server import router as add_server_router
+from backend.app.api.delete_server import router as delete_server_router
 #from backend.app.api import servers, domains, accounts, summary
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -27,6 +29,8 @@ app.include_router(accounts_router)
 app.include_router(dashboard_router)
 app.include_router(summary_router)
 app.include_router(report_router) 
+app.include_router(add_server_router)
+app.include_router(delete_server_router)
 
 @app.get("/")
 def root():
