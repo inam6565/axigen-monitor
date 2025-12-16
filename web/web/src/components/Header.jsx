@@ -39,18 +39,27 @@ const Header = ({ setSidebarOpen }) => {
             <FiMenu className="h-6 w-6" />
           </button>
           
-          <div className="ml-4 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FiSearch className="h-5 w-5 text-gray-400" />
+          <div className="ml-4 flex items-center space-x-2"> {/* Flex container for input and button */}
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FiSearch className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+                onKeyDown={handleKeyPress} // Trigger search on Enter key press
+                placeholder="Search domains or accounts..."
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+              />
             </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // Update search query
-              onKeyDown={handleKeyPress} // Trigger search on Enter key press
-              placeholder="Search domains or accounts..."
-              className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-            />
+            {/* Search Button */}
+            <button
+              onClick={handleSearch}
+              className="px-4 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800" // Light black color on default and dark black on hover
+            >
+              Search
+            </button>
           </div>
         </div>
         
@@ -65,13 +74,6 @@ const Header = ({ setSidebarOpen }) => {
             <span className="ml-2 text-sm font-medium text-gray-700">Admin</span>
           </div>
         </div>
-      </div>
-
-      {/* Add Search Button to trigger search */}
-      <div className="flex justify-center mt-2">
-        <button onClick={handleSearch} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-          Search
-        </button>
       </div>
     </header>
   );
