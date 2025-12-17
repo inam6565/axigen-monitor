@@ -32,6 +32,7 @@ function App() {
               <Route path="/delete-server" element={<DeleteServerPage title="Delete Server" />} />
               <Route path="/server/:serverName" element={<SingleServerPage title="Server Details" />} />
               <Route path="/domain/:domain" element={<DomainPage title="Domain Details"/>} />
+              <Route path="/poll-data" element={<PlaceholderPage title="Poll Data"/>} />
               
               
             </Routes>

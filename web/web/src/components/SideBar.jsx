@@ -1,5 +1,5 @@
 
-import { FiHome, FiServer, FiGlobe, FiPlusCircle, FiTrash2 } from 'react-icons/fi'
+import { FiHome, FiServer, FiGlobe, FiPlusCircle, FiTrash2, FiDatabase   } from 'react-icons/fi'
 import { NavLink } from 'react-router-dom'
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
@@ -57,6 +57,17 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             >
               <FiTrash2 className="h-5 w-5" />
               <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>Delete Server</span>
+            </NavLink>
+          </li>
+                    <li>
+            <NavLink
+              to="/poll-data"
+              className={({ isActive }) => 
+                `flex items-center px-4 py-3 ${isActive ? 'bg-primary-50 text-primary-600' : 'text-gray-600 hover:bg-gray-50'}`
+              }
+            >
+              <FiDatabase className="h-5 w-5" />
+              <span className={`ml-3 ${sidebarOpen ? 'block' : 'hidden'}`}>Poll Data</span>
             </NavLink>
           </li>
         </ul>
