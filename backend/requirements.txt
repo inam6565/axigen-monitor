@@ -1,4 +1,2 @@
-fastapi
-uvicorn[standard]
-SQLAlchemy>=2.0
-psycopg2-binary
+dnspython==2.8.0
+idna==3.11

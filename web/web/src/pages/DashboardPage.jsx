@@ -102,7 +102,7 @@ const handleExportCSV = async () => {
   try {
     // Fetch the data from the backend API
     const response = await fetch(`${API_BASE_URL}/report`);
-    
+
     // Ensure the response is OK (status code 200)
     if (!response.ok) {
       console.error("Failed to fetch report data. Status:", response.status);
@@ -119,19 +119,35 @@ const handleExportCSV = async () => {
       return;
     }
 
-    // Process the data to extract relevant details for CSV export
-    const processedData = [];
+    // --- 1. OverviewSheet --- 
+    const overviewData = [
+      {
+        TotalServers: data.servers.length,
+        TotalDomains: data.servers.reduce((sum, server) => sum + server.domains.length, 0),
+        TotalAccounts: data.servers.reduce(
+          (sum, server) => sum + server.domains.reduce((domainSum, domain) => domainSum + domain.accounts.length, 0),
+          0
+        ),
 
-    data.servers.forEach(server => {
-      // For each server, we loop through the domains and accounts
-      server.domains.forEach(domain => {
-        domain.accounts.forEach(account => {
-          processedData.push({
+        TotalUsedMB: data.servers.reduce(
+          (sum, server) =>
+            sum + server.domains.reduce((domainSum, domain) => domainSum + domain.accounts.reduce((accSum, account) => accSum + account.used_mb, 0), 0),
+          0
+        ),
+
+      }
+    ];
+
+    // --- 2. ServerSheet ---
+    const serverData = [];
+    data.servers.forEach((server) => {
+      server.domains.forEach((domain) => {
+        domain.accounts.forEach((account) => {
+          serverData.push({
             Server: server.name,
             Hostname: server.hostname,
             Domain: domain.name,
             Account: account.email,  // Account name (email in this case)
-            Status: account.status ? account.status : "N/A",  // Account status, if available
             AssignedMB: account.assigned_mb,
             UsedMB: account.used_mb,
             FreeMB: account.free_mb
@@ -140,19 +156,45 @@ const handleExportCSV = async () => {
       });
     });
 
-    console.log("Processed Data for CSV:", processedData); // Log the processed data
+    // --- 3. DomainSheet ---
+    const domainData = [];
+    data.servers.forEach((server) => {
+      server.domains.forEach((domain) => {
+        domain.accounts.forEach((account) => {
+          domainData.push({
+            Domain: domain.name,
+            Account: account.email,
+            AssignedMB: account.assigned_mb,
+            UsedMB: account.used_mb,
+            FreeMB: account.free_mb
+          });
+        });
+      });
+    });
 
-    if (processedData.length === 0) {
-      console.error("No data to export.");
-      return;
-    }
+    console.log("Overview Data:", overviewData);
+    console.log("Server Data:", serverData);
+    console.log("Domain Data:", domainData);
 
-    // Convert the processed data to CSV format using PapaParse
-    const csv = Papa.unparse(processedData);
-    console.log("CSV data generated:", csv); // Log the generated CSV
+    // Convert each data array to CSV format using PapaParse
+    const overviewCSV = Papa.unparse(overviewData);
+    const serverCSV = Papa.unparse(serverData);
+    const domainCSV = Papa.unparse(domainData);
 
-    // Create a Blob from the CSV and trigger the download
-    const blob = new Blob([csv], { type: "text/csv" });
+    // Combine the CSVs into a single file, each sheet as a separate CSV block
+    const combinedCSV = `
+OverviewSheet
+${overviewCSV}
+
+ServerSheet
+${serverCSV}
+
+DomainSheet
+${domainCSV}
+`;
+
+    // Create a Blob from the combined CSV and trigger the download
+    const blob = new Blob([combinedCSV], { type: "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "report.csv"; // Default download file name
@@ -161,6 +203,7 @@ const handleExportCSV = async () => {
     console.error("Error exporting CSV:", error);
   }
 };
+
 
 
   return (
