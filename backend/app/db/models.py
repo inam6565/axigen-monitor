@@ -11,6 +11,7 @@ from sqlalchemy import (
     func,
     UniqueConstraint,
     Index,
+    String
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -146,3 +147,32 @@ class AccountChange(Base):
 
     happened_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     run_id = Column(UUID(as_uuid=True), ForeignKey("snapshots.id"), nullable=True)
+
+
+class Job(Base):
+    __tablename__ = "jobs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    name = Column(String, nullable=False)
+    status = Column(String, nullable=True)  # e.g., PENDING, RUNNING, DONE, FAILED
+    created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
+    started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    finished_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    max_parallel_servers = Column(Integer, nullable=True)
+    keep_logs_days = Column(Integer, nullable=True)
+
+    logs = relationship("JobLog", back_populates="job", cascade="all, delete-orphan")
+
+
+class JobLog(Base):
+    __tablename__ = "job_logs"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    job_id = Column(UUID(as_uuid=True), ForeignKey("jobs.id", ondelete="CASCADE"))
+    server_id = Column(UUID(as_uuid=True), ForeignKey("servers.id", ondelete="SET NULL"))
+    status = Column(String, nullable=True)  # e.g., PENDING, RUNNING, DONE, FAILED
+    started_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    finished_at = Column(TIMESTAMP(timezone=True), nullable=True)
+    log_text = Column(Text, nullable=True)
+
+    job = relationship("Job", back_populates="logs")

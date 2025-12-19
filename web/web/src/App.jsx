@@ -11,6 +11,7 @@ import DomainPage from "./pages/DomainPage" // The domain page component
 import ServersPage from './pages/ServerPage'
 import AddServerPage from './pages/add_server'
 import DeleteServerPage from './pages/delete_server'
+import PollDataPage from './pages/PollDataPage'
 
 
 function App() {
@@ -32,7 +33,7 @@ function App() {
               <Route path="/delete-server" element={<DeleteServerPage title="Delete Server" />} />
               <Route path="/server/:serverName" element={<SingleServerPage title="Server Details" />} />
               <Route path="/domain/:domain" element={<DomainPage title="Domain Details"/>} />
-              <Route path="/poll-data" element={<PlaceholderPage title="Poll Data"/>} />
+              <Route path="/poll-data" element={<PollDataPage title="Poll Data"/>} />
               
               
             </Routes>
