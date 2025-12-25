@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16
+    container_name: axigen_db
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - axigen_net
+
+    # ❌ NOT exposed publicly
+    # No ports section = internal only
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: axigen_backend
+    restart: unless-stopped
+
+    env_file:
+      - .env
+
+    depends_on:
+      - db
+
+    ports:
+      - "8000:8000"   # API exposed
+
+    networks:
+      - axigen_net
+
+volumes:
+  postgres_data:
+
+networks:
+  axigen_net:
+    driver: bridge
