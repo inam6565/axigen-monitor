@@ -13,7 +13,7 @@ const useApi = (endpoint) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      const response = await fetch(`${API_BASE_URL}${endpoint}/`);
       if (!response.ok) throw new Error("Failed to fetch");
       const result = await response.json();
       setData(result);
@@ -47,7 +47,7 @@ const ServerPage = () => {
       const stats = await Promise.all(
         servers.map(async (server) => {
           try {
-            const response = await fetch(`${API_BASE_URL}/domains/server/${server.id}`);
+            const response = await fetch(`${API_BASE_URL}/domains/server/${server.id}/`);
             const domains = await response.json();
             const totalAccounts = domains.reduce(
               (sum, domain) => sum + domain.total_accounts,
@@ -76,7 +76,7 @@ const ServerPage = () => {
   // Function to handle exporting data to CSV
   const handleExportCSV = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/report`);
+      const response = await fetch(`${API_BASE_URL}/report/`);
       if (!response.ok) {
         console.error("Failed to fetch report data. Status:", response.status);
         throw new Error("Failed to fetch report data");
@@ -119,7 +119,7 @@ const ServerPage = () => {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/delete_server`, {
+      const response = await fetch(`${API_BASE_URL}/delete_server/`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

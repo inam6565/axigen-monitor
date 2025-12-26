@@ -45,7 +45,7 @@ function formatDateTime(dt) {
 }
 
 async function apiJson(path, options) {
-  const res = await fetch(`${API_BASE_URL}${path}`, options);
+  const res = await fetch(`${API_BASE_URL}${path}/`, options);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(text || `Request failed: ${res.status}`);

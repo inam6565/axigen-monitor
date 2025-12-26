@@ -32,7 +32,7 @@ const ServerPage = () => {
         setServer(selectedServer);
 
         // Fetch the domains for the specific server using the server ID
-        const domainResponse = await fetch(`${API_BASE_URL}/domains/server/${selectedServer.id}`);
+        const domainResponse = await fetch(`${API_BASE_URL}/domains/server/${selectedServer.id}/`);
         if (!domainResponse.ok) {
           throw new Error("Failed to fetch server domains");
         }

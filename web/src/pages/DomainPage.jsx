@@ -16,10 +16,10 @@ const DomainPage = () => {
   // Fetch domain and account data on component mount or when domain/account changes
   useEffect(() => {
     const fetchDomainData = async () => {
-      let endpoint = `${API_BASE_URL}/report/?domain=${domain}`;
+      let endpoint = `${API_BASE_URL}/report/?domain=${domain}/`;
 
       if (accountEmail) {
-        endpoint = `${API_BASE_URL}/report/?account=${accountEmail}`;
+        endpoint = `${API_BASE_URL}/report/?account=${accountEmail}/`;
       }
 
       console.log("Fetching data from endpoint:", endpoint); // Debugging line

@@ -12,7 +12,7 @@ from backend.app.api import add_server, jobs
 #from backend.app.api import servers, domains, accounts, summary
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(title="Axigen Multi-Server API",redirect_slashes=False)
+app = FastAPI(title="Axigen Multi-Server API", routes=[],redirect_slashes=False)
 
 # Add CORS middleware
 app.add_middleware(
