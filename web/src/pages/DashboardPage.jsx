@@ -14,7 +14,7 @@ const useApi = (endpoint) => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`);
+      const response = await fetch(`${API_BASE_URL}${endpoint}/`);
       if (!response.ok) throw new Error("Failed to fetch");
       const result = await response.json();
       setData(result);
@@ -59,7 +59,7 @@ const DashboardPage = () => {
       const stats = await Promise.all(
         servers.map(async (server) => {
           try {
-            const response = await fetch(`${API_BASE_URL}/domains/server/${server.id}`);
+            const response = await fetch(`${API_BASE_URL}/domains/server/${server.id}/`);
             const domains = await response.json();
             const totalAccounts = domains.reduce(
               (sum, domain) => sum + domain.total_accounts,
@@ -101,7 +101,7 @@ const handleExportCSV = async () => {
 
   try {
     // Fetch the data from the backend API
-    const response = await fetch(`${API_BASE_URL}/report`);
+    const response = await fetch(`${API_BASE_URL}/report/`);
 
     // Ensure the response is OK (status code 200)
     if (!response.ok) {
