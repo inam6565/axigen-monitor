@@ -13,7 +13,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.delete("", response_model=ResponseMessage)
+@router.delete("/", response_model=ResponseMessage)
 async def delete_server_api(payload: DeleteServerRequest, db: AsyncSession = Depends(get_db)):
     # Check if server exists first
     query = await db.execute(select(Server).where(Server.hostname == payload.hostname))

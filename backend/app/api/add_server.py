@@ -13,7 +13,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.post("", response_model=ResponseMessage)
+@router.post("/", response_model=ResponseMessage)
 async def add_server(payload: ServerCreate, db: AsyncSession = Depends(get_db)):
     # Prevent duplicate hostname
     existing = await db.execute(
