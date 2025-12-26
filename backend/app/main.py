@@ -17,7 +17,7 @@ app = FastAPI(title="Axigen Multi-Server API")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Your Vite dev server
+    allow_origins=["*"],  # Your Vite dev server
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
