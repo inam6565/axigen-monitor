@@ -12,7 +12,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.get("/domain/{domain_id}", response_model=list[AccountOut])
+@router.get("/domain/{domain_id}/", response_model=list[AccountOut])
 async def get_accounts(domain_id: str, db: AsyncSession = Depends(get_db)):
     query = select(Account).where(Account.domain_id == domain_id)
     result = await db.execute(query)

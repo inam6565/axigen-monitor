@@ -12,7 +12,7 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-@router.get("/server/{server_id}", response_model=list[DomainOut])
+@router.get("/server/{server_id}/", response_model=list[DomainOut])
 async def get_domains(server_id: str, db: AsyncSession = Depends(get_db)):
     query = select(Domain).where(Domain.server_id == server_id)
     result = await db.execute(query)
