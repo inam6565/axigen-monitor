@@ -35,7 +35,7 @@ const AddServerPage = () => {
     setLoading(true); // Show loading indicator
 
     try {
-      const response = await fetch(`${API_BASE_URL}/add_server`, {
+      const response = await fetch(`${API_BASE_URL}/add_server/`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
