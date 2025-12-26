@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle } from "lucide-react"; // For icons
 import { useNavigate } from "react-router-dom"; // For redirection
+import API_BASE_URL from "../config/api";
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // Your API base URL
 
 const DeleteServerPage = () => {
   const [hostname, setHostname] = useState(""); // To store the hostname to be deleted

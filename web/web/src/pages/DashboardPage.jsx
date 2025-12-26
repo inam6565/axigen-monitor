@@ -3,8 +3,8 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Server, Database, Users, Clock, Download } from "lucide-react";
 import StatCard from "../components/StatCard";
 import Papa from "papaparse";  // Import PapaParse
+import API_BASE_URL from "../config/api";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
 
 const useApi = (endpoint) => {
   const [data, setData] = useState(null);

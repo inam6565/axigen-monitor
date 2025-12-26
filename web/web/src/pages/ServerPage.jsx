@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Download, Trash2 } from "lucide-react"; // Importing the Delete icon
 import { useNavigate } from "react-router-dom"; // For redirection
 import Papa from "papaparse"; // Import PapaParse for CSV export
-
-const API_BASE_URL = "http://127.0.0.1:8000"; // Your API base URL
+import API_BASE_URL from "../config/api";
 
 // Fetch data hook
 const useApi = (endpoint) => {

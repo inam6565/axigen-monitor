@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom"; // For dynamic domain and account params
 import { Server, CheckCircle, User } from "lucide-react"; // Importing icons from lucide-react
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // Your API base URL
+import API_BASE_URL from "../config/api";
 
 const DomainPage = () => {
   const { domain } = useParams(); // Extract domain from URL

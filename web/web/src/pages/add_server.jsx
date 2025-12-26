@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // For redirection after success
 import { AlertCircle } from "lucide-react"; // For error icon
+import API_BASE_URL from "../config/api";
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // Your API base URL
 
 const AddServerPage = () => {
   const [formData, setFormData] = useState({

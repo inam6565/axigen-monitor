@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom"; // For dynamic server name in URL
 import { Server, Monitor, File, User } from "lucide-react"; // Importing icons from lucide-react
 
-const API_BASE_URL = "http://127.0.0.1:8000"; // Your API base URL
+import API_BASE_URL from "../config/api";
 
 const ServerPage = () => {
   const { serverName } = useParams(); // Extract server name from URL
