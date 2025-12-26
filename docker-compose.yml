@@ -39,7 +39,7 @@ services:
   frontend:
     container_name: axigen_frontend
     build:
-      context: ./web
+      context: ./web/web
       dockerfile: Dockerfile
       args:
         # 👇 Injected at build time into Vite
