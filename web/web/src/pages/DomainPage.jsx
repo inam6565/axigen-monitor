@@ -130,6 +130,7 @@ const DomainPage = () => {
 
 // Helper function to format MB/GB
 const formatMB = (mb) => {
+  mb = mb ?? 0; // if mb is null or undefined, set it to 0
   const gb = mb / 1024;
   return gb >= 1 ? `${gb.toFixed(2)} GB` : `${mb} MB`;
 };
