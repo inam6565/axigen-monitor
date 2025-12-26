@@ -68,7 +68,7 @@ async def create_job(max_parallel_servers: int = 3, db: AsyncSession = Depends(g
 # -----------------------
 # GET /jobs
 # -----------------------
-@router.get("/", response_model=List[JobBase])
+@router.get("", response_model=List[JobBase])
 async def get_jobs(limit: int = 10, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Job).order_by(Job.created_at.desc()).limit(limit))
     jobs = result.scalars().all()
