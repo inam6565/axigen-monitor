@@ -29,9 +29,10 @@ services:
 
     depends_on:
       - db
-
+    # Backend is accessible only internally, no need to expose port
     ports:
-      - "8000:8000"   # API exposed
+      # Commented out since we don't want the backend port exposed to the host machine
+      #- "8000:8000"   # API exposed
 
     networks:
       - axigen_net
@@ -42,8 +43,8 @@ services:
       context: ./web
       dockerfile: Dockerfile
       args:
-        # 👇 Injected at build time into Vite
-        VITE_API_BASE_URL: http://localhost:8000
+        # Use the internal Docker network name (axigen_backend) to communicate with the backend container
+        VITE_API_BASE_URL: http://axigen_backend:8000
 
     restart: unless-stopped
 
