@@ -22,7 +22,7 @@ const DeleteServerPage = () => {
     setLoading(true); // Show loading state
 
     try {
-      const response = await fetch(`${API_BASE_URL}/delete_server/`, {
+      const response = await fetch(`${API_BASE_URL}/delete_server`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
