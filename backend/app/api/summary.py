@@ -6,7 +6,7 @@ from backend.app.db.models import Server, Domain, Account, Snapshot
 
 router = APIRouter()
 
-@router.get("/summary")
+@router.get("/summary/")
 async def get_summary():
     async with AsyncSessionLocal() as db:
         # Servers count
