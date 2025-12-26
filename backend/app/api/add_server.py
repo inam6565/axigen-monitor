@@ -7,7 +7,7 @@ from backend.app.db.models import Server
 from backend.app.schemas.add_server import ServerCreate, ResponseMessage
 from backend.app.utils.encrypt import encrypt_password
 
-router = APIRouter(prefix="/add_server", tags=["AddServers"])
+router = APIRouter(prefix="/add_server/", tags=["AddServers"])
 
 async def get_db():
     async with AsyncSessionLocal() as session:

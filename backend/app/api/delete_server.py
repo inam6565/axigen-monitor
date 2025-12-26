@@ -6,7 +6,7 @@ from backend.app.db.base import AsyncSessionLocal
 from backend.app.db.models import Server
 from backend.app.schemas.delete_server import DeleteServerRequest, ResponseMessage
 
-router = APIRouter(prefix="/delete_server", tags=["DeleteServer"])
+router = APIRouter(prefix="/delete_server/", tags=["DeleteServer"])
 
 # Dependency to get async DB session
 async def get_db():
