@@ -37,4 +37,4 @@ ENV PYTHONPATH=/app
 # - Then start FastAPI
 # -------------------------
 CMD alembic upgrade head && \
-    uvicorn backend.app.main:app \
+    uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 \
