@@ -1,0 +1,10 @@
+/* Custom styles can be added here */
+.transition-all {
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.sidebar-transition {
+  transition: width 0.3s ease;
+}
