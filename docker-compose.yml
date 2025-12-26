@@ -14,26 +14,44 @@ services:
 
     networks:
       - axigen_net
-
-    # ❌ NOT exposed publicly
-    # No ports section = internal only
+    # ❌ No ports → DB is private
 
   backend:
+    container_name: axigen_backend
     build:
       context: .
       dockerfile: Dockerfile
 
-    container_name: axigen_backend
     restart: unless-stopped
 
     env_file:
-      - .env
+      - .env   # contains DB creds, secrets, etc
 
     depends_on:
       - db
 
     ports:
       - "8000:8000"   # API exposed
+
+    networks:
+      - axigen_net
+
+  frontend:
+    container_name: axigen_frontend
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        # 👇 Injected at build time into Vite
+        VITE_API_BASE_URL: http://backend:8000
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:80"
+
+    depends_on:
+      - backend
 
     networks:
       - axigen_net
