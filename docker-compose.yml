@@ -32,7 +32,7 @@ services:
     # Backend is accessible only internally, no need to expose port
     ports:
       # Commented out since we don't want the backend port exposed to the host machine
-      #- "8000:8000"   # API exposed
+      - "8000:8000"   # API exposed
 
     networks:
       - axigen_net
