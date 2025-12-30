@@ -4,9 +4,6 @@ This project collects domain and mailbox quota data from one or more **Axigen Ma
 
 ---
 
-![Project Screenshot](web/src/assets/Dashboard.png)
-
----
 ## 🏗️ Architecture Overview
 
 **3‑Tier Architecture**
