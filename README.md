@@ -51,7 +51,11 @@ Python packages (installed via `requirements.txt`):
 Create a `.env` file in project root:
 
 ```env
-DATABASE_URL=postgresql+asyncpg://axigen_user:password@localhost:5432/axigen_db
+POSTGRES_DB=axigen_db
+POSTGRES_USER=axigen_user
+POSTGRES_PASSWORD=axigen_password
+
+DATABASE_URL=postgresql+asyncpg://axigen_user:password@db:5432/axigen_db
 FERNET_KEY=your_generated_fernet_key
 ```
 
