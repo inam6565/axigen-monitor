@@ -31,7 +31,7 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
     && chown -R nginx:nginx /var/cache/nginx /var/run /var/log/nginx
 
 # Run as non-root user provided by the image
-USER nginx
+#USER nginx
 
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
