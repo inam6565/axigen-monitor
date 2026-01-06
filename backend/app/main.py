@@ -14,10 +14,19 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Axigen Multi-Server API", routes=[],redirect_slashes=False)
 
+# -------------------------------
+# CORS configuration
+# -------------------------------
+# Comma-separated list of allowed frontend URLs for Docker / Dev / Prod
+FRONTEND_URLS = os.environ.get(
+    "FRONTEND_URLS",
+    "http://localhost,http://axigen_frontend"  # Default dev/internal Docker URLs
+).split(",")
+
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Your Vite dev server
+    allow_origins=FRONTEND_URLS,  # Only frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

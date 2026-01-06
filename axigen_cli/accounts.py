@@ -10,6 +10,7 @@ import csv
 
 from .client import AxigenCLIClient, AxigenCLIError
 from .qoutas import get_account_quota  # <-- NEW IMPORT
+from .tls import TLSMode, resolve_verify
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -102,37 +103,58 @@ def _size_kb_to_gb(kb_value) -> Optional[int]:
 # ------------------------------
 # Fetch WebAdmin TSV
 # ------------------------------
-def _fetch_webadmin_accounts(host: str, port: int, user: str, password: str) -> Optional[List[Dict]]:
-    urls = [
-        f"https://{host}:{port}/data/accounts",  # HTTPS first (Ace is HTTPS-only)
-        f"http://{host}:{port}/data/accounts",   # HTTP fallback (Podbeez is HTTP)
-    ]
+def _fetch_webadmin_accounts(
+    host: str,
+    port: int,
+    user: str,
+    password: str,
+    tls_mode: TLSMode = TLSMode.STRICT,
+    ca_bundle: Optional[str] = None,
+) -> Optional[List[Dict]]:
+
+    verify = resolve_verify(tls_mode, ca_bundle)
+
+    if tls_mode == TLSMode.INSECURE:
+        print(
+            "TLS verification DISABLED for %s:%s (explicit insecure mode)",
+            host, port
+        )
+
+    if tls_mode == TLSMode.DISABLED:
+        urls = [f"http://{host}:{port}/data/accounts"]
+    else:
+        urls = [
+            f"https://{host}:{port}/data/accounts",
+            f"http://{host}:{port}/data/accounts",
+        ]
 
     for url in urls:
         try:
-            
             resp = requests.get(
                 url,
                 auth=(user, password),
-                verify=False,   # allow expired/self-signed certs (Ace)
+                verify=verify if verify is not None else True,
                 timeout=8,
-                headers={"Connection": "close"},  # helps with some servers
+                headers={"Connection": "close"},
             )
-            print("[DEBUG] status:", resp.status_code)
 
             if resp.status_code != 200:
                 continue
 
             rows = _parse_tsv_accounts(resp.text)
-            print("[DEBUG] parsed rows:", len(rows))
             if rows:
                 return rows
 
+        except requests.exceptions.SSLError:
+            if tls_mode == TLSMode.STRICT:
+                raise
+            continue
         except Exception as e:
-            print("[DEBUG] webadmin fetch exception:", repr(e))
+            print("WebAdmin fetch error %s: %r", url, e)
             continue
 
     return None
+
 
 # ------------------------------
 # Main Function
@@ -144,6 +166,8 @@ def list_accounts_for_domain(
     password: str,
     domain: str,
     webadmin_port: int = 9000,
+    tls_mode: TLSMode = TLSMode.STRICT,
+    ca_bundle: Optional[str] = None,
 ) -> List[Dict]:
     """
     Returns list of accounts with quotas:
@@ -176,7 +200,7 @@ def list_accounts_for_domain(
     full_emails = [f"{lp}@{domain}" for lp in local_parts]
 
     # -------- WEBADMIN: fetch TSV once --------
-    tsv_accounts = _fetch_webadmin_accounts(host, webadmin_port, username, password)
+    tsv_accounts = _fetch_webadmin_accounts(host, webadmin_port, username, password, tls_mode=tls_mode, ca_bundle=ca_bundle, )
     
     results = []
 

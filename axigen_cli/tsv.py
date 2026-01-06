@@ -5,7 +5,7 @@ import requests
 import urllib3
 from io import StringIO
 import csv
-
+from .tls import TLSMode, resolve_verify
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -129,34 +129,39 @@ def prepare_from_tsv_rows(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
-async def _fetch_webadmin_accounts(host: str, port: int, user: str, password: str) -> Optional[List[Dict]]:
+async def _fetch_webadmin_accounts(
+    host: str,
+    port: int,
+    user: str,
+    password: str,
+    tls_mode: TLSMode = TLSMode.STRICT,
+    ca_bundle: Optional[str] = None,
+) -> Optional[List[Dict]]:
     urls = [
-        f"https://{host}:{port}/data/accounts",  # HTTPS first (Ace is HTTPS-only)
-        f"http://{host}:{port}/data/accounts",   # HTTP fallback (Podbeez is HTTP)
+        f"https://{host}:{port}/data/accounts",
+        f"http://{host}:{port}/data/accounts",
     ]
 
     for url in urls:
         try:
-            
+            verify = resolve_verify(tls_mode, ca_bundle)
+
             resp = requests.get(
                 url,
                 auth=(user, password),
-                verify=False,   # allow expired/self-signed certs (Ace)
+                verify=verify,
                 timeout=8,
-                headers={"Connection": "close"},  # helps with some servers
+                headers={"Connection": "close"},
             )
-            print("[DEBUG] status:", resp.status_code)
 
             if resp.status_code != 200:
                 continue
 
             rows = _parse_tsv_accounts(resp.text)
-            print("[DEBUG] parsed rows:", len(rows))
             if rows:
                 return rows
 
-        except Exception as e:
-            print("[DEBUG] webadmin fetch exception:", repr(e))
+        except Exception:
             continue
 
     return None
